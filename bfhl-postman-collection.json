@@ -1,0 +1,492 @@
+{
+  "info": {
+    "name": "BFHL API - Full Test Suite",
+    "_postman_id": "bfhl-test-suite-jatin-2026",
+    "description": "Complete test suite for the BFHL REST API assignment. Set {{baseUrl}} to http://localhost:8080 for local testing or your Render URL for production.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "Change to your Render URL after deployment e.g. https://bfhl-api.onrender.com"
+    }
+  ],
+  "item": [
+    {
+      "name": "✅ Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success is true', () => pm.expect(j.is_success).to.be.true);",
+                  "pm.test('official_email present', () => pm.expect(j.official_email).to.be.a('string').and.include('@chitkara'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "✅ POST /bfhl — Happy Paths",
+      "item": [
+        {
+          "name": "fibonacci: 7 → [0,1,1,2,3,5,8]",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"fibonacci\": 7\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success true', () => pm.expect(j.is_success).to.be.true);",
+                  "pm.test('official_email present', () => pm.expect(j.official_email).to.be.a('string'));",
+                  "pm.test('data is correct fibonacci sequence', () => {",
+                  "  pm.expect(j.data).to.deep.equal([0,1,1,2,3,5,8]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "fibonacci: 1 → [0]",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"fibonacci\": 1\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('data is [0]', () => pm.expect(pm.response.json().data).to.deep.equal([0]));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "fibonacci: 0 → []",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"fibonacci\": 0\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('data is []', () => pm.expect(pm.response.json().data).to.deep.equal([]));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "prime: [2,4,7,9,11] → [2,7,11]",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"prime\": [2, 4, 7, 9, 11]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success true', () => pm.expect(j.is_success).to.be.true);",
+                  "pm.test('correct primes returned', () => pm.expect(j.data).to.deep.equal([2,7,11]));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "prime: [1,2,3,4,5,6,7] → [2,3,5,7]",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"prime\": [1, 2, 3, 4, 5, 6, 7]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('1 not prime, rest correct', () => pm.expect(pm.response.json().data).to.deep.equal([2,3,5,7]));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "lcm: [12,18,24] → 72",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"lcm\": [12, 18, 24]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success true', () => pm.expect(j.is_success).to.be.true);",
+                  "pm.test('LCM is 72', () => pm.expect(j.data).to.equal(72));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "lcm: [100000, 99999] (overflow test)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"lcm\": [100000, 99999]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('LCM is 9999900000 (no overflow)', () => pm.expect(pm.response.json().data).to.equal(9999900000));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "hcf: [24,36,60] → 12",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"hcf\": [24, 36, 60]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success true', () => pm.expect(j.is_success).to.be.true);",
+                  "pm.test('HCF is 12', () => pm.expect(j.data).to.equal(12));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "hcf: [100, 75, 50] → 25",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"hcf\": [100, 75, 50]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('HCF is 25', () => pm.expect(pm.response.json().data).to.equal(25));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "AI: capital of Maharashtra → single word",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"AI\": \"What is the capital city of Maharashtra?\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success true', () => pm.expect(j.is_success).to.be.true);",
+                  "pm.test('data is a single word string', () => {",
+                  "  pm.expect(j.data).to.be.a('string');",
+                  "  pm.expect(j.data.trim().split(/\\s+/).length).to.equal(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "AI: capital of India → single word",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"AI\": \"What is the capital of India?\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('data is single word', () => pm.expect(pm.response.json().data.trim().split(/\\s+/).length).to.equal(1));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "❌ POST /bfhl — Error Cases",
+      "item": [
+        {
+          "name": "No key provided → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('is_success false', () => pm.expect(j.is_success).to.be.false);",
+                  "pm.test('official_email still present', () => pm.expect(j.official_email).to.be.a('string'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Multiple keys → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"fibonacci\": 5,\n  \"prime\": [2, 3]\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Malformed JSON → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "this is not json" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negative fibonacci → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"fibonacci\": -5\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Empty prime array → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"prime\": []\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Empty lcm array → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"lcm\": []\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Empty hcf array → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"hcf\": []\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Blank AI question → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"AI\": \"   \"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wrong type (string for fibonacci) → 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bfhl",
+            "body": { "mode": "raw", "raw": "{\n  \"fibonacci\": \"seven\"\n}" }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('is_success false', () => pm.expect(pm.response.json().is_success).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
